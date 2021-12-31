@@ -28,7 +28,17 @@ def push_text_message(reply_token, text):
     line_bot_api.push_message(reply_token, TextSendMessage(text=text))
 
     return "OK"
-
+def push_button_message(reply_token,text,buttons):
+    line_bot_api = LineBotApi(channel_access_token)
+    line_bot_api.push_message(  # 回復傳入的訊息文字
+                        reply_token,
+                        TemplateSendMessage(
+                            alt_text=text,
+                            template=buttons
+                        )
+                    )
+    return "OK"
+    
 def send_image_url(id, img_url):
     line_bot_api = LineBotApi(channel_access_token)
     message = ImageSendMessage(

@@ -1,7 +1,7 @@
 from fsm import TocMachine
 def create_machine():
     machine = TocMachine(
-        states=["user", "menu","location", "chinese","japanese","america","bbq","others"],
+        states=["user", "menu","location", "chinese","japanese","america","bbq","others","price"],
         transitions=[
             {
                 "trigger": "advance",
@@ -12,6 +12,12 @@ def create_machine():
             {
                 "trigger": "advance",
                 "source": "location",
+                "dest": "price",
+                "conditions": "is_going_to_price",
+            },
+            {
+                "trigger": "advance",
+                "source": "price",
                 "dest": "menu",
                 "conditions": "is_going_to_menu",
             },
@@ -45,7 +51,7 @@ def create_machine():
                 "dest": "others",
                 "conditions": "is_going_to_others",
             },
-            {"trigger": "go_back", "source": ["menu", "chinese","japanese","america","bbq","location","others"], "dest": "user"},
+            {"trigger": "go_back", "source": ["chinese","japanese","america","bbq","others"], "dest": "user"},
         ],
         initial="user",
         auto_transitions=False,

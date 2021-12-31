@@ -1,6 +1,6 @@
 from transitions.extensions import GraphMachine
 
-from utils import push_text_message, send_button_message, send_image_url, send_text_message
+from utils import push_button_message, push_text_message, send_button_message, send_image_url, send_text_message
 from linebot.models import ButtonsTemplate,MessageTemplateAction
 
 import requests
@@ -14,6 +14,23 @@ class TocMachine(GraphMachine):
         text = event.message.text
         self.text=text+"市"
         return 1
+
+    def is_going_to_price(self, event):
+        text = event.message.text
+        self.price_text=text
+        if text=="150以內":
+            self.price=1
+            return 1
+        elif text=="150-600":
+            self.price=2
+            return 1
+        elif text=="600-1200":
+            self.price=3
+            return 1
+        elif text=="1200以上":
+            self.price=4
+            return 1
+        return 0
 
     def is_going_to_menu(self, event):
         text = event.message.text
@@ -41,7 +58,46 @@ class TocMachine(GraphMachine):
 
     def on_enter_location(self, event):
         print("I'm entering location")
-        push_text_message(event.source.user_id,"您選擇了%s，請輸入“選單”"%(self.text))
+        reply_token = event.reply_token
+        buttons=ButtonsTemplate(
+                                title='price',
+                                text='請選擇想要的價位',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='150以內',
+                                        text='150以內'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='150-600',
+                                        text='150-600'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='600-1200',
+                                        text='600-1200'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='1200以上',
+                                        text='1200以上'
+                                    )
+                                ]
+                            )
+        push_text_message(event.source.user_id,"您選擇了%s"%(self.text))
+        send_button_message(reply_token,"Menu",buttons)
+        
+    def on_enter_price(self, event):
+        print("I'm entering price")
+        reply_token = event.reply_token
+        buttons=ButtonsTemplate(
+                                title='Menu',
+                                text="您選擇了%s,請點選“選單”"%(self.price_text),
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='選單',
+                                        text='選單'
+                                    )
+                                ]
+                            )
+        send_button_message(reply_token,"Menu",buttons)
 
     def on_enter_menu(self, event):
         print("I'm entering menu")
@@ -78,7 +134,7 @@ class TocMachine(GraphMachine):
 
         reply_token = event.reply_token
         try:
-            url="https://ifoodie.tw/explore/"+self.text+"/list/%E4%B8%AD%E5%BC%8F%E6%96%99%E7%90%86"
+            url="https://ifoodie.tw/explore/"+self.text+"/list/中式料理?priceLevel="+str(self.price)+"&opening=true"
             res=requests.get(url)
             root=bs4.BeautifulSoup(res.text,"html.parser")
             titles=root.find_all("a")
@@ -94,7 +150,29 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,random.choice(list))
         except:
             send_text_message(reply_token,"抱歉！我們找不到您所輸入的餐廳")
-        push_text_message(event.source.user_id,"您好！若要尋找餐廳請先輸入您現在所在的城市：")
+        buttons=ButtonsTemplate(
+                                title='請選擇城市',
+                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北',
+                                        text='台北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='新北',
+                                        text='新北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='高雄',
+                                        text='高雄'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台南',
+                                        text='台南'
+                                    )
+                                ]
+                            )
+        push_button_message(event.source.user_id,"location",buttons)
         self.go_back()
 
     def on_exit_chinese(self):
@@ -105,7 +183,7 @@ class TocMachine(GraphMachine):
 
         reply_token = event.reply_token
         try:
-            url="https://ifoodie.tw/explore/"+self.text+"/list/%E6%97%A5%E6%9C%AC%E6%96%99%E7%90%86"
+            url="https://ifoodie.tw/explore/"+self.text+"/list/日式料理?priceLevel="+str(self.price)+"&opening=true"
             res=requests.get(url)
             root=bs4.BeautifulSoup(res.text,"html.parser")
             titles=root.find_all("a")
@@ -121,7 +199,29 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,random.choice(list))
         except:
             send_text_message(reply_token,"抱歉！我們找不到您所輸入的餐廳")
-        push_text_message(event.source.user_id,"您好！若要尋找餐廳請先輸入您現在所在的城市：")
+        buttons=ButtonsTemplate(
+                                title='請選擇城市',
+                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北',
+                                        text='台北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='新北',
+                                        text='新北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='高雄',
+                                        text='高雄'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台南',
+                                        text='台南'
+                                    )
+                                ]
+                            )
+        push_button_message(event.source.user_id,"location",buttons)
         self.go_back()
 
     def on_exit_japenese(self):
@@ -131,7 +231,7 @@ class TocMachine(GraphMachine):
         print("I'm entering america")
         try:
             reply_token = event.reply_token
-            url="https://ifoodie.tw/explore/"+self.text+"/list//%E7%BE%8E%E5%BC%8F%E6%96%99%E7%90%86"
+            url="https://ifoodie.tw/explore/"+self.text+"/list/美式料理?priceLevel="+str(self.price)+"&opening=true"
             res=requests.get(url)
             root=bs4.BeautifulSoup(res.text,"html.parser")
             titles=root.find_all("a")
@@ -147,7 +247,29 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,random.choice(list))
         except:
             send_text_message(reply_token,"抱歉！我們找不到您所輸入的餐廳")
-        push_text_message(event.source.user_id,"您好！若要尋找餐廳請先輸入您現在所在的城市：")
+        buttons=ButtonsTemplate(
+                                title='請選擇城市',
+                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北',
+                                        text='台北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='新北',
+                                        text='新北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='高雄',
+                                        text='高雄'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台南',
+                                        text='台南'
+                                    )
+                                ]
+                            )
+        push_button_message(event.source.user_id,"location",buttons)
         self.go_back()
 
     def on_exit_america(self):
@@ -157,7 +279,7 @@ class TocMachine(GraphMachine):
         print("I'm entering bbq")
         try:
             reply_token = event.reply_token
-            url="https://ifoodie.tw/explore/"+self.text+"/list/%E7%87%92%E7%83%A4"
+            url="https://ifoodie.tw/explore/"+self.text+"/list/燒烤?priceLevel="+str(self.price)+"&opening=true"
             res=requests.get(url)
             root=bs4.BeautifulSoup(res.text,"html.parser")
             titles=root.find_all("a")
@@ -173,7 +295,29 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,random.choice(list))
         except:
             send_text_message(reply_token,"抱歉！我們找不到您所輸入的餐廳")
-        push_text_message(event.source.user_id,"您好！若要尋找餐廳請先輸入您現在所在的城市：")
+        buttons=ButtonsTemplate(
+                                title='請選擇城市',
+                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北',
+                                        text='台北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='新北',
+                                        text='新北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='高雄',
+                                        text='高雄'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台南',
+                                        text='台南'
+                                    )
+                                ]
+                            )
+        push_button_message(event.source.user_id,"location",buttons)
         self.go_back()
 
     def on_exit_bbq(self):
@@ -183,7 +327,7 @@ class TocMachine(GraphMachine):
         print("I'm entering others")
         try:
             reply_token = event.reply_token
-            url="https://ifoodie.tw/explore/"+self.text+"/list/"+self.type
+            url="https://ifoodie.tw/explore/"+self.text+"/list/"+self.type+"?priceLevel="+str(self.price)+"&opening=true"
             res=requests.get(url)
             root=bs4.BeautifulSoup(res.text,"html.parser")
             titles=root.find_all("a")
@@ -199,7 +343,29 @@ class TocMachine(GraphMachine):
             send_text_message(reply_token,random.choice(list))
         except:
             send_text_message(reply_token,"抱歉！我們找不到您所輸入的餐廳")
-        push_text_message(event.source.user_id,"您好！若要尋找餐廳請先輸入您現在所在的城市：")
+        buttons=ButtonsTemplate(
+                                title='請選擇城市',
+                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北',
+                                        text='台北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='新北',
+                                        text='新北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='高雄',
+                                        text='高雄'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台南',
+                                        text='台南'
+                                    )
+                                ]
+                            )
+        push_button_message(event.source.user_id,"location",buttons)
         self.go_back()
 
     def on_exit_others(self):
