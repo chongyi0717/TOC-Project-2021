@@ -5,39 +5,19 @@ from flask import Flask, jsonify, request, abort, send_file
 from dotenv import load_dotenv
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
-
-from fsm import TocMachine
+from linebot.models import MessageEvent, TextMessage, TextSendMessage,ImageSendMessage
+from linebot.models.messages import ImageMessage
+from machine import create_machine
 from utils import send_text_message
-
 load_dotenv()
 
 
-machine = TocMachine(
-    states=["user", "state1", "state2"],
-    transitions=[
-        {
-            "trigger": "advance",
-            "source": "user",
-            "dest": "state1",
-            "conditions": "is_going_to_state1",
-        },
-        {
-            "trigger": "advance",
-            "source": "user",
-            "dest": "state2",
-            "conditions": "is_going_to_state2",
-        },
-        {"trigger": "go_back", "source": ["state1", "state2"], "dest": "user"},
-    ],
-    initial="user",
-    auto_transitions=False,
-    show_conditions=True,
-)
+
 
 app = Flask(__name__, static_url_path="")
 
-
+machines={}
+machine=create_machine()
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv("LINE_CHANNEL_SECRET", None)
 channel_access_token = os.getenv("LINE_CHANNEL_ACCESS_TOKEN", None)
@@ -100,12 +80,15 @@ def webhook_handler():
             continue
         if not isinstance(event.message.text, str):
             continue
-        print(f"\nFSM STATE: {machine.state}")
+        #print(f"\nFSM STATE: {machines[event.source.user_id].state}")
         print(f"REQUEST BODY: \n{body}")
-        response = machine.advance(event)
-        if response == False:
-            send_text_message(event.reply_token, "Not Entering any State")
+        if event.source.user_id not in machines:
+            machines[event.source.user_id] = create_machine()
 
+        response = machines[event.source.user_id].advance(event)
+        if response == False:
+            send_text_message(event.reply_token, "無法辨識您輸入的指令，請依照指示輸入指令")
+            
     return "OK"
 
 
@@ -116,5 +99,6 @@ def show_fsm():
 
 
 if __name__ == "__main__":
+    machine.get_graph().draw("img/show-fsm.png", prog="dot", format="png")
     port = os.environ.get("PORT", 8000)
     app.run(host="0.0.0.0", port=port, debug=True)
