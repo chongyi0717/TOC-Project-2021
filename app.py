@@ -1,14 +1,15 @@
 import os
 import sys
+from types import DynamicClassAttribute
 
 from flask import Flask, jsonify, request, abort, send_file
 from dotenv import load_dotenv
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage,ImageSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage,ImageSendMessage,ButtonsTemplate,MessageTemplateAction
 from linebot.models.messages import ImageMessage
 from machine import create_machine
-from utils import send_text_message
+from utils import send_text_message,push_button_message
 load_dotenv()
 
 
@@ -65,13 +66,39 @@ def webhook_handler():
     # get request body as text
     body = request.get_data(as_text=True)
     app.logger.info(f"Request body: {body}")
-
     # parse webhook body
     try:
         events = parser.parse(body, signature)
     except InvalidSignatureError:
         abort(400)
-
+    body_json=request.get_json()
+    if(body_json["events"][0]["type"]=="follow"):
+        buttons=ButtonsTemplate(
+                                title='請選擇城市',
+                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='台北',
+                                        text='台北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='新北',
+                                        text='新北'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='高雄',
+                                        text='高雄'
+                                    ),
+                                    MessageTemplateAction(
+                                        label='台南',
+                                        text='台南'
+                                    )
+                                ]
+                            )
+        push_button_message(body_json["events"][0]["source"]["userId"],"location",buttons)
+    if(body_json["events"][0]["type"]=="unfollow" or body_json["events"][0]["type"]=="leave"):
+        del machines[body_json["events"][0]["source"]["userId"]]
+        print("del")
     # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
         if not isinstance(event, MessageEvent):
@@ -82,6 +109,7 @@ def webhook_handler():
             continue
         #print(f"\nFSM STATE: {machines[event.source.user_id].state}")
         print(f"REQUEST BODY: \n{body}")
+        
         if event.source.user_id not in machines:
             machines[event.source.user_id] = create_machine()
 
