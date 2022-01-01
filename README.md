@@ -28,6 +28,8 @@ Finite state machine is a model in [Theory of Computation](https://en.wikipedia.
 <p align=center>
     <img src="img/pre_menu.jpg" width="384" height="682.4">
 </p>
+
+使用網路爬蟲從網頁抓取符合條件且正在營業的餐廳資料，並隨機選擇一個餐廳
 <p align=center>
     <img src="img/menu.jpg" width="384" height="682.4">
 </p>
