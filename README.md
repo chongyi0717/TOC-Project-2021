@@ -1,5 +1,5 @@
 <p align=center>
-    <img src="img/greeting.jpg">
+    <img src="img/greeting.jpg" width="240" height="340">
 </p>
 
 ## FSM
@@ -14,23 +14,23 @@ Finite state machine is a model in [Theory of Computation](https://en.wikipedia.
 
 選擇所在城市
 <p align=center>
-    <img src="img/location.jpg">
+    <img src="img/location.jpg" width="240" height="340">
 </p>
 
 選擇價位
 <p align=center>
-    <img src="img/price.jpg">
+    <img src="img/price.jpg" width="240" height="340">
 </p>
 
 選擇想要吃怎樣的餐點
 <p align=center>
-    <img src="img/pre_menu.jpg">
+    <img src="img/pre_menu.jpg" width="240" height="340">
 </p>
 <p align=center>
-    <img src="img/menu.jpg">
+    <img src="img/menu.jpg" width="240" height="340">
 </p>
 
 ## QRCode
 <p align=center>
-    <img src="img/qrcode.png">
+    <img src="img/qrcode.png" width="240" height="340">
 </p>
