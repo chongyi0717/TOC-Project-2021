@@ -14,23 +14,23 @@ Finite state machine is a model in [Theory of Computation](https://en.wikipedia.
 
 選擇所在城市
 <p align=center>
-    <img src="img/location.jpg" width="240" height="340">
+    <img src="img/location.jpg" width="384" height="682.4">
 </p>
 
 選擇價位
 <p align=center>
-    <img src="img/price.jpg" width="240" height="340">
+    <img src="img/price.jpg" width="384" height="682.4">
 </p>
 
 選擇想要吃怎樣的餐點
 <p align=center>
-    <img src="img/pre_menu.jpg" width="240" height="340">
+    <img src="img/pre_menu.jpg" width="384" height="682.4">
 </p>
 <p align=center>
-    <img src="img/menu.jpg" width="240" height="340">
+    <img src="img/menu.jpg" width="384" height="682.4">
 </p>
 
 ## QRCode
 <p align=center>
-    <img src="img/qrcode.png" width="240" height="340">
+    <img src="img/qrcode.png" width="384" height="682.4">
 </p>
