@@ -71,34 +71,36 @@ def webhook_handler():
         events = parser.parse(body, signature)
     except InvalidSignatureError:
         abort(400)
+    print(body)
     body_json=request.get_json()
-    if(body_json["events"][0]["type"]=="follow"):
-        buttons=ButtonsTemplate(
-                                title='請選擇城市',
-                                text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
-                                actions=[
-                                    MessageTemplateAction(
-                                        label='台北',
-                                        text='台北'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='新北',
-                                        text='新北'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='高雄',
-                                        text='高雄'
-                                    ),
-                                    MessageTemplateAction(
-                                        label='台南',
-                                        text='台南'
-                                    )
-                                ]
-                            )
-        push_button_message(body_json["events"][0]["source"]["userId"],"location",buttons)
-    if(body_json["events"][0]["type"]=="unfollow" or body_json["events"][0]["type"]=="leave"):
-        del machines[body_json["events"][0]["source"]["userId"]]
-        print("del")
+    if body_json["destination"]!="U06ca89d886c034d5c9185af475919dd9":
+        if(body_json["events"][0]["type"]=="follow"):
+            buttons=ButtonsTemplate(
+                                    title='請選擇城市',
+                                    text='您好！若要尋找餐廳請先輸入您現在所在的城市(若選項中沒有對應的城市可自行輸入)：',
+                                    actions=[
+                                        MessageTemplateAction(
+                                            label='台北',
+                                            text='台北'
+                                        ),
+                                        MessageTemplateAction(
+                                            label='新北',
+                                            text='新北'
+                                        ),
+                                        MessageTemplateAction(
+                                            label='高雄',
+                                            text='高雄'
+                                        ),
+                                        MessageTemplateAction(
+                                            label='台南',
+                                            text='台南'
+                                        )
+                                    ]
+                                )
+            push_button_message(body_json["events"][0]["source"]["userId"],"location",buttons)
+        if(body_json["events"][0]["type"]=="unfollow" or body_json["events"][0]["type"]=="leave"):
+            del machines[body_json["events"][0]["source"]["userId"]]
+            print("del")
     # if event is MessageEvent and message is TextMessage, then echo text
     for event in events:
         if not isinstance(event, MessageEvent):
