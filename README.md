@@ -12,6 +12,11 @@
 
 Finite state machine is a model in [Theory of Computation](https://en.wikipedia.org/wiki/Theory_of_computation). This model is implemented in App. Each feature is represented by a **state**, and the button that user pressed on the carousel template will trigger the **transitions** between states. The FSM graph is drawn by **GraphMachine** in [transitions.extensions](https://github.com/pytransitions/transitions).
 
+## Basic
+
+可接受複數個用戶
+可處理解除好友後的狀態
+
 ## Features
 
 選擇所在城市
@@ -38,3 +43,4 @@ Finite state machine is a model in [Theory of Computation](https://en.wikipedia.
 <p align=center>
     <img src="img/qrcode.png">
 </p>
+
