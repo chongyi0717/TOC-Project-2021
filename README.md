@@ -32,5 +32,5 @@ Finite state machine is a model in [Theory of Computation](https://en.wikipedia.
 
 ## QRCode
 <p align=center>
-    <img src="img/qrcode.png" width="384" height="682.4">
+    <img src="img/qrcode.png">
 </p>
